@@ -1,15 +1,14 @@
 import Head from 'next/head'
+import Sidebar from '../components/Sidebar'
 
 export default function Home() {
   return (
-    <div className="">
+    <div className="bg-black h-screen overflow-hidden">
       <Head>
         <title>Spotify Clone</title>
       </Head>
-      <h1>Hello world</h1>
-
-      <main>
-        {/* Sidebar */}
+      <main className=''>
+        <Sidebar />
         {/* Center */}
       </main>
 
