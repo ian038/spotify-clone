@@ -1,13 +1,64 @@
 import NextAuth from "next-auth"
-import Providers from "next-auth/providers"
-import { LOGIN_URL } from "../../../lib/spotify"
+import SpotifyProvider from "next-auth/providers/spotify"
+import spotifyApi, { LOGIN_URL } from "../../../lib/spotify"
+
+const refreshAccessToken = async (token) => {
+    try {
+        spotifyApi.setAccessToken(token.accessToken)
+        spotifyApi.setRefreshToken(token.refreshAccessToken)
+
+        const { body: refreshedToken } = await spotifyApi.refreshAccessToken()
+
+        return {
+            ...token,
+            accessToken: refreshedToken.access_token,
+            refreshToken: refreshedToken.refresh_token ?? token.refreshToken,
+            accessTokenExpires: Date.now + refreshedToken.expires_in * 1000
+        }
+    } catch (error) {
+        console.log(error)
+        return {
+            ...token,
+            error: 'RefreshAccessTokenError'
+        }
+    }
+}
 
 export default NextAuth({
     providers: [
-        Providers.Spotify({
+        SpotifyProvider({
             clientId: process.env.SPOTIFY_ID,
             clientSecret: process.env.SPOTIFY_SECRET,
             authorization: LOGIN_URL
         })
-    ]
+    ],
+    secret: process.env.JWT_SECRET,
+    pages: {
+        signIn: '/login'
+    },
+    callbacks: {
+        async jwt({ token, account, user }) {
+            if (account && user) {
+                return {
+                    ...token,
+                    accessToken: account.access_token,
+                    refreshToken: account.refresh_token,
+                    username: account.providerAccountId,
+                    accessTokenExpires: account.expires_at * 1000
+                }
+            }
+
+            if (Date.now() < token.accessTokenExpires) return token
+
+            return await refreshAccessToken(token)
+        },
+
+        async session({ session, token }) {
+            session.user.accessToken = token.accessToken
+            session.user.refreshToken = token.refreshToken
+            session.user.username = token.username
+
+            return session
+        }
+    }
 })
