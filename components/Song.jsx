@@ -6,7 +6,7 @@ import { millisToMinutesAndSeconds } from '../lib/time';
 
 export default function Song({ order, track }) {
     const spotifyApi = useSpotify()
-    const [currenTrackId, setCurrentTrackId] = useRecoilState(currenTrackState)
+    const [currenTrackId, setCurrentTrackId] = useRecoilState(currenTrackIdState)
     const [isPlaying, setIsPlaying] = useRecoilState(isPlayingState)
 
     const playSong = () => {

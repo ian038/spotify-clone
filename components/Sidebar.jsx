@@ -7,7 +7,7 @@ import { playlistIdState } from '../atoms/playlistAtom';
 
 export default function Sidebar() {
     const spotifyApi = useSpotify()
-    const { data: session, status } = useSession()
+    const { data: session } = useSession()
     const [playlists, setPlaylists] = useState([])
     const [playlistId, setPlaylistId] = useRecoilState(playlistIdState)
 
