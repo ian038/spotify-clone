@@ -1,3 +1,5 @@
+import { SwitchHorizontalIcon } from '@heroicons/react/outline';
+import { FastForwardIcon, PauseIcon, ReplyIcon, RewindIcon, PlayIcon, VolumeUpIcon } from '@heroicons/react/solid';
 import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -13,10 +15,9 @@ export default function Player() {
     const [volume, setVolume] = useState(25)
     const songInfo = useSongInfo()
 
-    const fetchCurrentSong = async () => {
+    const fetchCurrentSong = () => {
         if (!songInfo) {
             spotifyApi.getMyCurrentPlayingTrack().then(data => {
-                console.log('Now playing ', data.body?.item)
                 setCurrentTrackId(data.body?.item?.id)
 
                 spotifyApi.getMyCurrentPlaybackState().then(data => {
@@ -24,6 +25,19 @@ export default function Player() {
                 })
             })
         }
+    }
+
+    const handlePlayPause = () => {
+        spotifyApi.getMyCurrentPlaybackState().then(data => {
+            console.log(data)
+            if (data.body.is_playing) {
+                spotifyApi.pause()
+                setIsPlaying(false)
+            } else {
+                spotifyApi.play()
+                setIsPlaying(true)
+            }
+        })
     }
 
     useEffect(() => {
@@ -42,6 +56,22 @@ export default function Player() {
                     <h3>{songInfo?.name}</h3>
                     <p>{songInfo?.artists?.[0]?.name}</p>
                 </div>
+            </div>
+
+            <div className='flex items-center justify-evenly'>
+                <SwitchHorizontalIcon className='button' />
+                <RewindIcon className='button' onClick={() => spotifyApi.skipToPrevious()} />
+                {isPlaying ? (
+                    <PauseIcon onClick={handlePlayPause} className='button w-10 h-10' />
+                ) : (
+                    <PlayIcon onClick={handlePlayPause} className='button w-10 h-10' />
+                )}
+                <FastForwardIcon className='button' onClick={() => spotifyApi.skipToNext()} />
+                <ReplyIcon className='button' />
+            </div>
+
+            <div>
+                <VolumeUpIcon className='button' />
             </div>
         </div>
     )
