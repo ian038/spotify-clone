@@ -1,5 +1,5 @@
 import { SwitchHorizontalIcon } from '@heroicons/react/outline';
-import { FastForwardIcon, PauseIcon, ReplyIcon, RewindIcon, PlayIcon, VolumeUpIcon, MinusCircleIcon } from '@heroicons/react/solid';
+import { FastForwardIcon, PauseIcon, ReplyIcon, RewindIcon, PlayIcon, MinusCircleIcon, PlusCircleIcon } from '@heroicons/react/solid';
 import { debounce } from 'lodash';
 import { useSession } from 'next-auth/react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -87,7 +87,7 @@ export default function Player() {
                 <MinusCircleIcon className='button' onClick={() => volume > 0 && setVolume(volume - 10)} />
                 <input onChange={e => setVolume(Number(e.target.value))}
                     className='w-14 md:w-28' type='range' value={volume} min={0} max={100} />
-                <VolumeUpIcon onClick={() => volume < 100 && setVolume(volume + 10)} className='button' />
+                <PlusCircleIcon onClick={() => volume < 100 && setVolume(volume + 10)} className='button' />
             </div>
         </div>
     )
